@@ -1,14 +1,30 @@
-# csp-adapter-discord
+# csp discord adapter
 
-CSP adapter for Discord
+A [csp](https://github.com/point72/csp) adapter for [discord](https://discord.com)
 
-[![Build Status](https://github.com/timkpaine/csp-adapter-discord/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/timkpaine/csp-adapter-discord/actions/workflows/build.yml)
-[![codecov](https://codecov.io/gh/timkpaine/csp-adapter-discord/branch/main/graph/badge.svg)](https://codecov.io/gh/timkpaine/csp-adapter-discord)
-[![License](https://img.shields.io/github/license/timkpaine/csp-adapter-discord)](https://github.com/timkpaine/csp-adapter-discord)
+[![Build Status](https://github.com/timkpaine/csp-adapter-slack/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/timkpaine/csp-adapter-discord/actions?query=workflow%3A%22Build+Status%22)
+[![GitHub issues](https://img.shields.io/github/issues/timkpaine/csp-adapter-discord.svg)](https://github.com/timkpaine/csp-adapter-discord/issues)
+[![PyPI](https://img.shields.io/pypi/l/csp-adapter-discord.svg)](https://pypi.python.org/pypi/csp-adapter-discord)
 [![PyPI](https://img.shields.io/pypi/v/csp-adapter-discord.svg)](https://pypi.python.org/pypi/csp-adapter-discord)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/timkpaine/csp-adapter-discord/main?urlpath=lab)
 
-## Overview
+## Features
 
-> [!NOTE]
-> This library was generated using [copier](https://copier.readthedocs.io/en/stable/) from the [Base Python Project Template repository](https://github.com/python-project-templates/base).
+[More information is available in our wiki](https://github.com/timkpaine/csp-adapter-discord/wiki)
+
+## Installation
+
+Install with `pip`:
+
+```bash
+pip install csp csp-adapter-discord
+```
+
+Install with `conda`
+
+```bash
+conda install csp csp-adapter-discord -c conda-forge
+```
+
+## License
+
+This software is licensed under the Apache 2.0 license. See the [LICENSE](LICENSE) file for details.
