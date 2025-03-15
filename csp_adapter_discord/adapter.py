@@ -5,51 +5,26 @@ from logging import getLogger
 from queue import Queue
 from threading import Thread
 from time import sleep
-from typing import Dict, List, Optional, TypeVar, Union
+from typing import Dict, TypeVar, Union
 
 import csp
 from csp.impl.adaptermanager import AdapterManagerImpl
 from csp.impl.outputadapter import OutputAdapter
 from csp.impl.pushadapter import PushInputAdapter
-from csp.impl.struct import Struct
 from csp.impl.types.tstype import ts
 from csp.impl.wiring import py_output_adapter_def, py_push_adapter_def
-from discord import Client, DMChannel, File, GroupChannel, Intents, Message, TextChannel, User
+from discord import Client, DMChannel, File, GroupChannel, Intents, TextChannel, User
 from discord.utils import get
 
 from .adapter_config import DiscordAdapterConfig
+from .message import DiscordMessage
 
 T = TypeVar("T")
 Channel = Union[DMChannel, TextChannel, GroupChannel]
 log = getLogger(__file__)
 
 
-__all__ = ("DiscordMessage", "mention_user", "DiscordAdapterManager")
-
-
-class DiscordMessage(Struct):
-    user: str
-    user_email: str  # email of the author
-    user_id: str  # user id of the author
-    tags: List[str]  # list of mentions
-
-    channel: str  # name of channel
-    channel_id: str  # id of channel
-    channel_type: str  # type of channel, in "message", "public" (app_mention), "private" (app_mention)
-
-    msg: str  # parsed text payload
-    reaction: str  # emoji reacts
-    thread: str  # thread id, if in thread
-    payload: Optional[Message] = None  # raw message payload
-
-
-def mention_user(userid: str) -> str:
-    """Convenience method, more difficult to do in symphony but we want discord to be symmetric"""
-    if userid.startswith("<@") and userid.endswith(">"):
-        return userid
-    if userid.startswith("@"):
-        return f"<{userid}>"
-    return f"<@{userid}>"
+__all__ = ("DiscordAdapterManager",)
 
 
 class DiscordAdapterManager(AdapterManagerImpl):

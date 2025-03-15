@@ -9,7 +9,14 @@ A [csp](https://github.com/point72/csp) adapter for [discord](https://discord.co
 
 ## Features
 
+The Discord adapter allows for reading and writing of messages from the [Discord](https://discord.com/) message platform using [`discord.py`](https://discordpy.readthedocs.io/en/stable/).
+
 [More information is available in our wiki](https://github.com/timkpaine/csp-adapter-discord/wiki)
+
+## Chat Framework
+
+`csp-chat` is a framework for writing cross-platform, command oriented chat bots.
+It will be released in 2025 with initial support for `Slack`, `Symphony`, and `Discord`.
 
 ## Installation
 
