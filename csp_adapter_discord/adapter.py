@@ -52,7 +52,7 @@ class DiscordAdapterManager(AdapterManagerImpl):
     _token: str
 
     def __init__(self, config: DiscordAdapterConfig):
-        self._discord_client = Client(intents=Intents.default())
+        self._discord_client = Client(intents=Intents(config.intents))
         self._token = config.token
 
         # down stream edges
@@ -162,6 +162,8 @@ class DiscordAdapterManager(AdapterManagerImpl):
                     # pull DiscordMessage from queue
                     discord_msg = self._outqueue.get()
 
+                    log.debug(f"Outbound: {discord_msg}")
+
                     # refactor into discord message
                     # grab channel or DM
                     if hasattr(discord_msg, "channel_id") and discord_msg.channel_id:
@@ -199,6 +201,8 @@ class DiscordAdapterManager(AdapterManagerImpl):
                     self._channel_id_to_channel[message.channel.id] = message.channel
                 if message.channel.name not in self._channel_name_to_channel:
                     self._channel_name_to_channel[message.channel.name] = message.channel
+
+                log.debug(f"Inbound: {message}")
 
                 # push message to inqueue
                 self._inqueue.put(
