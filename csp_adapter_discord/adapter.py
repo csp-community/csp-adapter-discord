@@ -1,10 +1,11 @@
 import threading
 from asyncio import sleep as asleep
+from io import StringIO
 from logging import getLogger
 from queue import Queue
 from threading import Thread
 from time import sleep
-from typing import Dict, List, TypeVar, Union
+from typing import Dict, List, Optional, TypeVar, Union
 
 import csp
 from csp.impl.adaptermanager import AdapterManagerImpl
@@ -13,7 +14,7 @@ from csp.impl.pushadapter import PushInputAdapter
 from csp.impl.struct import Struct
 from csp.impl.types.tstype import ts
 from csp.impl.wiring import py_output_adapter_def, py_push_adapter_def
-from discord import Client, DMChannel, GroupChannel, Intents, Message, TextChannel, User
+from discord import Client, DMChannel, File, GroupChannel, Intents, Message, TextChannel, User
 from discord.utils import get
 
 from .adapter_config import DiscordAdapterConfig
@@ -39,11 +40,15 @@ class DiscordMessage(Struct):
     msg: str  # parsed text payload
     reaction: str  # emoji reacts
     thread: str  # thread id, if in thread
-    payload: Message  # raw message payload
+    payload: Optional[Message] = None  # raw message payload
 
 
 def mention_user(userid: str) -> str:
     """Convenience method, more difficult to do in symphony but we want discord to be symmetric"""
+    if userid.startswith("<@") and userid.endswith(">"):
+        return userid
+    if userid.startswith("@"):
+        return f"<{userid}>"
     return f"<@{userid}>"
 
 
@@ -110,8 +115,9 @@ class DiscordAdapterManager(AdapterManagerImpl):
         if not user:
             # try to pull from discord
             user = self._discord_client.get_user(user_id)
-            if user:
-                self._user_id_to_user[user_id] = user
+            if not user:
+                raise ValueError(f"User with id {user_id} not found")
+            self._user_id_to_user[user_id] = user
         return user
 
     def _get_user_from_name(self, user_name):
@@ -121,8 +127,9 @@ class DiscordAdapterManager(AdapterManagerImpl):
         if not user:
             # try to pull from discord
             user = get(self._discord_client.get_all_members(), name=user_name)
-            if user:
-                self._user_name_to_user_id[user_name] = user
+            if not user:
+                raise ValueError(f"User with name {user_name} not found")
+            self._user_name_to_user_id[user_name] = user
         return user
 
     def _channel_data_to_channel_kind(self, data) -> str:
@@ -138,18 +145,28 @@ class DiscordAdapterManager(AdapterManagerImpl):
         if not channel:
             # try to pull from discord
             channel = self._discord_client.get_channel(channel_id)
-            if channel:
-                self._channel_id_to_channel[channel_id] = channel
+            if not channel:
+                raise ValueError(f"Channel with id {channel_id} not found")
+            self._channel_id_to_channel[channel_id] = channel
         return channel
 
     def _get_channel_from_name(self, channel_name):
-        # try to pull from cache
-        channel = self._channel_name_to_channel.get(channel_name, None)
+        # first, see if its a regular name or tagged name
+        if channel_name.startswith("<#") and channel_name.endswith(">"):
+            # strip out the tag
+            channel_name = int(channel_name[2:-1])
+            # try to pull from ID cache
+            channel = self._get_channel_from_id(channel_name)
+        else:
+            # try to pull from cache
+            channel = self._channel_name_to_channel.get(channel_name, None)
+
         if not channel:
             # try to pull from discord
             channel = get(self._discord_client.get_all_channels(), name=channel_name)
-            if channel:
-                self._channel_name_to_channel[channel_name] = channel
+            if not channel:
+                raise ValueError(f"Channel with name {channel_name} not found")
+            self._channel_name_to_channel[channel_name] = channel
         return channel
 
     def _run(self):
@@ -158,31 +175,49 @@ class DiscordAdapterManager(AdapterManagerImpl):
         @self._discord_client.event
         async def on_ready():
             while True:
-                while not self._outqueue.empty():
-                    # pull DiscordMessage from queue
-                    discord_msg = self._outqueue.get()
+                try:
+                    while not self._outqueue.empty():
+                        # pull DiscordMessage from queue
+                        discord_msg = self._outqueue.get()
 
-                    log.debug(f"Outbound: {discord_msg}")
+                        log.debug(f"Outbound: {discord_msg}")
 
-                    # refactor into discord message
-                    # grab channel or DM
-                    if hasattr(discord_msg, "channel_id") and discord_msg.channel_id:
-                        channel = self._get_channel_from_id(int(discord_msg.channel_id))
-                    elif hasattr(discord_msg, "channel") and discord_msg.channel:
-                        # TODO DM
-                        channel = self._get_channel_from_name(discord_msg.channel)
+                        # refactor into discord message
+                        # grab channel or DM
+                        if hasattr(discord_msg, "channel_id") and discord_msg.channel_id:
+                            channel = self._get_channel_from_id(int(discord_msg.channel_id))
+                        elif hasattr(discord_msg, "channel") and discord_msg.channel:
+                            # TODO DM
+                            channel = self._get_channel_from_name(discord_msg.channel)
 
-                    # pull text or reaction
-                    if hasattr(discord_msg, "reaction") and discord_msg.reaction and hasattr(discord_msg, "thread") and discord_msg.thread:
-                        # Adding a reaction, so grab the message id and add a reaction
-                        message = await channel.fetch_message(int(discord_msg.thread))
-                        await message.add_reaction(discord_msg.reaction)
-                    elif hasattr(discord_msg, "msg") and discord_msg.msg:
-                        # send text to channel
-                        await channel.send(discord_msg.msg)
-                    else:
-                        # cannot send empty message, log an error
-                        log.error(f"Received malformed DiscordMessage instance: {discord_msg}")
+                        # pull text or reaction
+                        if hasattr(discord_msg, "reaction") and discord_msg.reaction and hasattr(discord_msg, "thread") and discord_msg.thread:
+                            # Adding a reaction, so grab the message id and add a reaction
+                            message = await channel.fetch_message(int(discord_msg.thread))
+                            await message.add_reaction(discord_msg.reaction)
+                        elif hasattr(discord_msg, "msg") and discord_msg.msg:
+                            # send text to channel
+                            # NOTE: discord has a limit of 2000 characters per message
+                            if len(discord_msg.msg) > 0:
+                                if len(discord_msg.msg) > 2000:
+                                    # Attach as file
+                                    io = StringIO(discord_msg.msg)
+                                    file = File(io, filename="response.md")
+                                    await channel.send(file=file)
+                                # TODO: use embeds?
+                                # elif len(discord_msg.msg) > 2000:
+                                #     # Attach as embed
+                                #     embedVar = Embed(title="Response", description=discord_msg.msg, color=0x00FF00)
+                                #     await channel.send(embed=embedVar)
+                                else:
+                                    await channel.send(discord_msg.msg)
+                        else:
+                            # cannot send empty message, log an error
+                            log.error(f"Received malformed DiscordMessage instance: {discord_msg}")
+                except KeyboardInterrupt:
+                    raise
+                except Exception:
+                    log.exception("Error sending discord message")
                 # short sleep
                 await asleep(1)
 
@@ -199,27 +234,42 @@ class DiscordAdapterManager(AdapterManagerImpl):
                     self._user_name_to_user[message.author.name] = message.author
                 if message.channel.id not in self._channel_id_to_channel:
                     self._channel_id_to_channel[message.channel.id] = message.channel
-                if message.channel.name not in self._channel_name_to_channel:
+                # cache channel by recipient name/id for DMs
+                if isinstance(message.channel, DMChannel):
+                    user_id = message.author.id
+                    self._channel_id_to_channel[user_id] = message.channel
+                    # NOTE: store as a string because we expect channel names to be strings
+                    self._channel_name_to_channel[str(message.channel.id)] = message.channel
+                    # NOTE: store as a string because we expect channel names to be strings
+                    self._channel_name_to_channel[str(user_id)] = message.channel
+                    self._channel_name_to_channel[message.author.name] = message.channel
+                if isinstance(message.channel, TextChannel) and message.channel.name not in self._channel_name_to_channel:
                     self._channel_name_to_channel[message.channel.name] = message.channel
 
                 log.debug(f"Inbound: {message}")
 
-                # push message to inqueue
-                self._inqueue.put(
-                    DiscordMessage(
-                        user=message.author.name,
-                        user_email="",
-                        user_id=str(message.author.id),
-                        tags=[id for id in message.mentions],
-                        channel=message.channel.name,
-                        channel_id=str(message.channel.id),
-                        channel_type=self._channel_data_to_channel_kind(message.channel),
-                        msg=message.content,
-                        reaction="",
-                        thread=str(message.thread.id) if message.thread else str(message.id),
-                        payload=message,
-                    )
+                # assemble message
+                # NOTE: for parity with slack, we replace the <@USERID> mentions with
+                # the actual user name
+                discord_msg = message.content
+                for mention in message.mentions:
+                    discord_msg = discord_msg.replace(f"<@{mention.id}>", f"<@{mention.name}>")
+                msg = DiscordMessage(
+                    user=message.author.name,
+                    user_email="",
+                    user_id=str(message.author.id),
+                    tags=[str(member.id) for member in message.mentions],
+                    channel="IM" if isinstance(message.channel, DMChannel) else message.channel.name,  # NOTE: matches symphony/slack
+                    channel_id=str(message.channel.id),
+                    channel_type=self._channel_data_to_channel_kind(message.channel),
+                    msg=discord_msg,
+                    reaction="",
+                    thread=str(message.thread.id) if message.thread else str(message.id),
+                    payload=message,
                 )
+
+                # push message to inqueue
+                self._inqueue.put(msg)
 
         # start the discord client
         discord_client_thread.start()
