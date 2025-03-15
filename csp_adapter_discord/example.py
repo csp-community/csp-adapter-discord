@@ -11,7 +11,7 @@ config = DiscordAdapterConfig(
 @csp.node
 def add_reaction_when_mentioned(msg: ts[DiscordMessage]) -> ts[DiscordMessage]:
     """Add a reaction to every message that starts with hello."""
-    if msg.content.lower().startswith("hello"):
+    if msg.msg.lower().startswith("hello"):
         return DiscordMessage(
             channel=msg.channel,
             thread=msg.thread,
@@ -27,13 +27,13 @@ def graph():
     msgs = csp.unroll(adapter.subscribe())
 
     # Print it out locally for debugging
-    csp.print("msgs:", msgs)
+    csp.print("msgs", msgs)
 
     # Add the reaction node
     reactions = add_reaction_when_mentioned(msgs)
 
     # Print it out locally for debugging
-    csp.print("reactions:", reactions)
+    csp.print("reactions", reactions)
 
     # Publish the reactions
     adapter.publish(reactions)
