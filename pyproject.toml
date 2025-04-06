@@ -49,14 +49,9 @@ develop = [
     "mdformat-tables>=1,<1.1",
     "pytest",
     "pytest-cov",
-<<<<<<< before updating
-    "ruff>=0.5,<0.12",
-    "twine>=5,<7",
-=======
     "ruff",
     "twine",
     "uv",
->>>>>>> after updating
     "wheel",
 ]
 
