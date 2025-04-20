@@ -58,8 +58,8 @@ develop = [
 [project.scripts]
 
 [project.urls]
-Repository = "https://github.com/timkpaine/csp-adapter-discord"
-Homepage = "https://github.com/timkpaine/csp-adapter-discord"
+Repository = "https://github.com/csp-community/csp-adapter-discord"
+Homepage = "https://github.com/csp-community/csp-adapter-discord"
 
 [tool.bumpversion]
 current_version = "0.1.2"

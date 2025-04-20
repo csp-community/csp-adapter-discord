@@ -35,7 +35,7 @@ test                           run the tests
 Clone the repo with:
 
 ```bash
-git clone https://github.com/timkpaine/csp-adapter-discord.git
+git clone https://github.com/csp-community/csp-adapter-discord.git
 cd csp-adapter-discord
 ```
 

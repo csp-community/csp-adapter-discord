@@ -22,15 +22,15 @@ configure `git` and your GitHub account for `csp-adapter-discord` development.
 ### Create your fork
 
 The first step is to create a personal fork of `csp-adapter-discord`. To do so, click
-the "fork" button at https://github.com/timkpaine/csp-adapter-discord, or just navigate
-[here](https://github.com/timkpaine/csp-adapter-discord/fork) in your browser. Set the
+the "fork" button at https://github.com/csp-community/csp-adapter-discord, or just navigate
+[here](https://github.com/csp-community/csp-adapter-discord/fork) in your browser. Set the
 owner of the repository to your personal GitHub account if it is not
 already set that way and click "Create fork".
 
 ### Configure remotes
 
 Next, you should set some names for the `git` remotes corresponding to
-main timkpaine repository and your fork. See the [GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/configuring-a-remote-repository-for-a-fork) for more information.
+main csp-community repository and your fork. See the [GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/configuring-a-remote-repository-for-a-fork) for more information.
 
 ### Authenticating with GitHub
 

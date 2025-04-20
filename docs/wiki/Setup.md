@@ -1,7 +1,7 @@
 This guide will help you setup a new Discord application.
 
 > [!TIP]
-> Find relevant docs with GitHub’s search function, use `repo:timkpaine/csp-adapter-discord type:wiki <search terms>` to search the documentation Wiki Pages.
+> Find relevant docs with GitHub’s search function, use `repo:csp-community/csp-adapter-discord type:wiki <search terms>` to search the documentation Wiki Pages.
 
 # Discord Configuration
 
