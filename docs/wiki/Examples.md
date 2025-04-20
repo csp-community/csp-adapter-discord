@@ -1,11 +1,11 @@
-The below examples are available [in-source](https://github.com/timkpaine/csp-adapter-discord/blob/main/csp_adapter_discord/examples/).
+The below examples are available [in-source](https://github.com/csp-community/csp-adapter-discord/blob/main/csp_adapter_discord/examples/).
 They assume the presence of a `.token` file in the run directory.
 Additionally, they assume all optional settings in [Setup](Setup) have been enabled.
 
 # Emoji Wave
 
 Here is a simple example that waves when someone says `hello` in a room or direct message to the bot.
-It is available in-source at [`csp_adapter_discord/examples/hello.py`](https://github.com/timkpaine/csp-adapter-discord/blob/main/csp_adapter_discord/examples/hello.py).
+It is available in-source at [`csp_adapter_discord/examples/hello.py`](https://github.com/csp-community/csp-adapter-discord/blob/main/csp_adapter_discord/examples/hello.py).
 
 ```python
 import csp

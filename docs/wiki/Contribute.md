@@ -1,8 +1,8 @@
-Contributions are welcome on this project. We distribute under the terms of the [Apache 2.0 license](https://github.com/timkpaine/csp-adapter-discord/blob/main/LICENSE).
+Contributions are welcome on this project. We distribute under the terms of the [Apache 2.0 license](https://github.com/csp-community/csp-adapter-discord/blob/main/LICENSE).
 
-For **bug reports** or **small feature requests**, please open an issue on our [issues page](https://github.com/timkpaine/csp-adapter-discord/issues).
+For **bug reports** or **small feature requests**, please open an issue on our [issues page](https://github.com/csp-community/csp-adapter-discord/issues).
 
-For **questions** or to discuss **larger changes or features**, please use our [discussions page](https://github.com/timkpaine/csp-adapter-discord/discussions).
+For **questions** or to discuss **larger changes or features**, please use our [discussions page](https://github.com/csp-community/csp-adapter-discord/discussions).
 
 For **contributions**, please see our [developer documentation](Local-Development-Setup). We have `help wanted` and `good first issue` tags on our issues page, so these are a great place to start.
 
