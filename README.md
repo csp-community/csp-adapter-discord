@@ -2,9 +2,15 @@
 
 A [csp](https://github.com/point72/csp) adapter for [discord](https://discord.com)
 
+<<<<<<< before updating
 [![Build Status](https://github.com/csp-community/csp-adapter-discord/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/csp-community/csp-adapter-discord/actions/workflows/build.yml)
 [![GitHub issues](https://img.shields.io/github/issues/csp-community/csp-adapter-discord.svg)](https://github.com/csp-community/csp-adapter-discord/issues)
 [![PyPI](https://img.shields.io/pypi/l/csp-adapter-discord.svg)](https://pypi.python.org/pypi/csp-adapter-discord)
+=======
+[![Build Status](https://github.com/csp-community/csp-adapter-discord/actions/workflows/build.yaml/badge.svg?branch=main&event=push)](https://github.com/csp-community/csp-adapter-discord/actions/workflows/build.yaml)
+[![codecov](https://codecov.io/gh/csp-community/csp-adapter-discord/branch/main/graph/badge.svg)](https://codecov.io/gh/csp-community/csp-adapter-discord)
+[![License](https://img.shields.io/github/license/csp-community/csp-adapter-discord)](https://github.com/csp-community/csp-adapter-discord)
+>>>>>>> after updating
 [![PyPI](https://img.shields.io/pypi/v/csp-adapter-discord.svg)](https://pypi.python.org/pypi/csp-adapter-discord)
 
 ## Features
