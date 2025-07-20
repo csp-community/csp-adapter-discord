@@ -150,9 +150,6 @@ csp_adapter_discord/labextension
 
 # Rust
 target
-<<<<<<< before updating
 
 # Discord Token
 .token
-=======
->>>>>>> after updating
