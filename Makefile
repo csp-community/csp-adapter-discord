@@ -15,44 +15,24 @@ install:  ## install library
 #########
 # LINTS #
 #########
-<<<<<<< before updating
-.PHONY: lint lints fix format lint-py lint-docs fix-py fix-docs
-
-lint-py:  ## run python linter with ruff
-=======
 .PHONY: lint-py lint-docs fix-py fix-docs lint lints fix format
 
 lint-py:  ## lint python with ruff
->>>>>>> after updating
 	python -m ruff check csp_adapter_discord
 	python -m ruff format --check csp_adapter_discord
 
 lint-docs:  ## lint docs with mdformat and codespell
-<<<<<<< before updating
-	python -m mdformat --check docs/wiki/ README.md
-	python -m codespell_lib docs/wiki/ README.md
-
-fix-py:  ## fix python formatting with ruff
-=======
 	python -m mdformat --check README.md docs/wiki/
 	python -m codespell_lib README.md docs/wiki/
 
 fix-py:  ## autoformat python code with ruff
->>>>>>> after updating
 	python -m ruff check --fix csp_adapter_discord
 	python -m ruff format csp_adapter_discord
 
 fix-docs:  ## autoformat docs with mdformat and codespell
-<<<<<<< before updating
-	python -m mdformat docs/wiki/ README.md
-	python -m codespell_lib --write docs/wiki/ README.md
-
-# alias
-=======
 	python -m mdformat README.md docs/wiki/
 	python -m codespell_lib --write README.md docs/wiki/
 
->>>>>>> after updating
 lint: lint-py lint-docs  ## run all linters
 lints: lint
 fix: fix-py fix-docs  ## run all autoformatters
