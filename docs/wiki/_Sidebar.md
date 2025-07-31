@@ -11,15 +11,12 @@ Notes for editors:
 **Get Started**
 
 - [Installation](Installation)
-<<<<<<< before updating
 - [Setup](Setup)
 - [API Reference](API-Reference)
 - [Examples](Examples)
 
 **Developer Guide**
 
-=======
->>>>>>> after updating
 - [Contributing](Contribute)
 - [Development Setup](Local-Development-Setup)
 - [Build from Source](Build-from-Source)
