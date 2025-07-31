@@ -1,5 +1,11 @@
 Contributions are welcome on this project. We distribute under the terms of the [Apache 2.0 license](https://github.com/csp-community/csp-adapter-discord/blob/main/LICENSE).
 
+> [!NOTE]
+>
+> `csp-adapter-discord` requires [Developer Certificate of Origin](https://en.wikipedia.org/wiki/Developer_Certificate_of_Origin) for all contributions.
+> This is enforced by a [Probot GitHub App](https://probot.github.io/apps/dco/), which checks that commits are "signed".
+> Read [instructions to configure commit signing](Local-Development-Setup#configure-commit-signing).
+
 For **bug reports** or **small feature requests**, please open an issue on our [issues page](https://github.com/csp-community/csp-adapter-discord/issues).
 
 For **questions** or to discuss **larger changes or features**, please use our [discussions page](https://github.com/csp-community/csp-adapter-discord/discussions).
