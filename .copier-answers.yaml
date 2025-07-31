@@ -2,6 +2,7 @@
 _commit: c53b04c
 _src_path: https://github.com/python-project-templates/base.git
 add_docs: false
+add_wiki: true
 add_extension: python
 email: t.paine154@gmail.com
 github: csp-community
