@@ -10,6 +10,7 @@ A [csp](https://github.com/point72/csp) adapter for [discord](https://discord.co
 
 ## Features
 
+<<<<<<< before updating
 The Discord adapter allows for reading and writing of messages from the [Discord](https://discord.com/) message platform using [`discord.py`](https://discordpy.readthedocs.io/en/stable/).
 
 [More information is available in our wiki](https://github.com/csp-community/csp-adapter-discord/wiki)
@@ -35,3 +36,7 @@ conda install csp csp-adapter-discord -c conda-forge
 ## License
 
 This software is licensed under the Apache 2.0 license. See the [LICENSE](https://github.com/csp-community/csp-adapter-discord/blob/main/LICENSE) file for details.
+=======
+> [!NOTE]
+> This library was generated using [copier](https://copier.readthedocs.io/en/stable/) from the [Base Python Project Template repository](https://github.com/python-project-templates/base).
+>>>>>>> after updating

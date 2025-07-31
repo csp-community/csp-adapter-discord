@@ -1,9 +1,9 @@
 # Changes here will be overwritten by Copier
-_commit: c53b04c
+_commit: 1cd0e6e
 _src_path: https://github.com/python-project-templates/base.git
 add_docs: false
-add_wiki: true
 add_extension: python
+add_wiki: true
 email: t.paine154@gmail.com
 github: csp-community
 project_description: CSP adapter for Discord
