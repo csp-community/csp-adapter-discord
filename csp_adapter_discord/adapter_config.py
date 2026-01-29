@@ -1,22 +1,33 @@
-from pathlib import Path
+"""Legacy adapter config - now use DiscordConfig from chatom.discord.
 
-from discord import Intents
+This module is deprecated. Use DiscordConfig from chatom.discord instead.
+The DiscordAdapterConfig class is kept for backwards compatibility but
+maps to chatom's DiscordConfig fields as closely as possible.
+"""
+
+from pathlib import Path
+from typing import List, Optional
+
 from pydantic import BaseModel, Field, field_validator
 
 __all__ = ("DiscordAdapterConfig",)
 
 
-def _get_default_intents_plus_read():
-    ret = Intents.default()
-    ret.message_content = True
-    return ret.value
-
-
 class DiscordAdapterConfig(BaseModel):
-    """A config class that holds the required information to interact with Discord."""
+    """Legacy config class for Discord adapter.
+
+    Deprecated: Use DiscordConfig from chatom.discord instead.
+
+    This class is maintained for backwards compatibility. New code should use:
+        from chatom.discord import DiscordConfig
+        config = DiscordConfig(token="...", guild_id="...")
+    """
 
     token: str = Field(description="The token for the Discord bot")
-    intents: int = Field(default_factory=_get_default_intents_plus_read, description="The intents for the Discord bot")
+    intents: Optional[List[str]] = Field(
+        default=None,
+        description="The intents for the Discord bot (e.g., ['guilds', 'guild_messages'])",
+    )
 
     @field_validator("token")
     def validate_token(cls, v):
@@ -26,8 +37,15 @@ class DiscordAdapterConfig(BaseModel):
             return v
         raise ValueError("Token must be valid or a file path")
 
-    @field_validator("intents")
-    def validate_intents(cls, v):
-        if isinstance(v, Intents):
-            return v.value
-        return v
+    def to_discord_config(self):
+        """Convert to chatom DiscordConfig.
+
+        Returns:
+            DiscordConfig: The equivalent chatom config.
+        """
+        from chatom.discord import DiscordConfig
+
+        return DiscordConfig(
+            bot_token=self.token,
+            intents=self.intents,
+        )
