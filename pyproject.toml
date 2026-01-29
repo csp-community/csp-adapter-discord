@@ -33,6 +33,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "chatom @ git+https://github.com/1kbgz/chatom.git@main",
     "csp",
     "discord.py",
     "pydantic>=2",
@@ -111,6 +112,9 @@ packages = ["csp_adapter_discord"]
 packages = ["csp_adapter_discord"]
 
 [tool.hatch.build.targets.wheel.shared-data]
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.pytest.ini_options]
 addopts = ["-vvv", "--junitxml=junit.xml"]
