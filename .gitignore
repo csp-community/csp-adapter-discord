@@ -156,11 +156,9 @@ csp_adapter_discord/labextension
 # Rust
 target
 
-<<<<<<< before updating
-# Discord Token
-.token
-=======
 # Hydra
 outputs/
 multirun/
->>>>>>> after updating
+
+# Discord Token
+.token
