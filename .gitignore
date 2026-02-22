@@ -141,14 +141,12 @@ js/node_modules
 js/test-results
 js/playwright-report
 js/*.tgz
-csp_adapter_discord/extension
 
 # Jupyter
 .ipynb_checkpoints
 .autoversion
 Untitled*.ipynb
-!csp_adapter_discord/extension/csp_adapter_discord.json
-!csp_adapter_discord/extension/install.json
+csp_adapter_discord/extension
 csp_adapter_discord/nbextension
 csp_adapter_discord/labextension
 
@@ -158,5 +156,11 @@ csp_adapter_discord/labextension
 # Rust
 target
 
+<<<<<<< before updating
 # Discord Token
 .token
+=======
+# Hydra
+outputs/
+multirun/
+>>>>>>> after updating
