@@ -38,5 +38,5 @@ def test_adapter_config_to_discord_config():
     # Convert to chatom config
     chatom_config = legacy_config.to_discord_config()
 
-    assert chatom_config.bot_token.get_secret_value() == token
+    assert (chatom_config.bot_token if isinstance(chatom_config.bot_token, str) else chatom_config.bot_token.get_secret_value()) == token
     assert chatom_config.intents == ["guilds", "guild_messages"]
