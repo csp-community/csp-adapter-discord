@@ -146,12 +146,10 @@ target
 outputs/
 multirun/
 
-<<<<<<< before updating
-# Discord Token
-.token
-=======
 # AI
 ROADMAP.md
 AGENTS.md
 .github/hooks/sdlc.json
->>>>>>> after updating
+
+# Discord Token
+.token
