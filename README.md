@@ -6,7 +6,6 @@ A [csp](https://github.com/point72/csp) adapter for [discord](https://discord.co
 [![codecov](https://codecov.io/gh/csp-community/csp-adapter-discord/branch/main/graph/badge.svg)](https://codecov.io/gh/csp-community/csp-adapter-discord)
 [![GitHub issues](https://img.shields.io/github/issues/csp-community/csp-adapter-discord.svg)](https://github.com/csp-community/csp-adapter-discord/issues)
 [![License](https://img.shields.io/github/license/csp-community/csp-adapter-discord)](https://github.com/csp-community/csp-adapter-discord)
-[![PyPI](https://img.shields.io/pypi/l/csp-adapter-discord.svg)](https://pypi.python.org/pypi/csp-adapter-discord)
 
 ## Features
 
