@@ -12,7 +12,7 @@ authors = [
 description = "CSP adapter for Discord"
 readme = "README.md"
 license = { text = "Apache-2.0" }
-version = "0.1.2"
+version = "0.2.0"
 requires-python = ">=3.10"
 keywords = [
     "csp",
@@ -68,7 +68,7 @@ Repository = "https://github.com/csp-community/csp-adapter-discord"
 Homepage = "https://github.com/csp-community/csp-adapter-discord"
 
 [tool.bumpversion]
-current_version = "0.1.2"
+current_version = "0.2.0"
 commit = true
 tag = true
 commit_args = "-s"
