@@ -53,6 +53,7 @@ develop = [
     "mdformat",
     "mdformat-tables>=1",
     "pytest",
+    "pytest-asyncio",
     "pytest-cov",
     "ruff",
     "twine",
@@ -87,6 +88,8 @@ replace = 'version = "{new_version}"'
 branch = true
 omit = [
     "csp_adapter_discord/tests/integration/",
+    "csp_adapter_discord/tests/discord_csp_e2e.py",
+    "csp_adapter_discord/examples/*",
 ]
 
 [tool.coverage.report]
