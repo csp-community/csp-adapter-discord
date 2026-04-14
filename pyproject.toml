@@ -37,7 +37,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "chatom @ git+https://github.com/1kbgz/chatom.git@main",
+    "chatom>=0.1.0,<0.2.0",
     "csp",
     "discord.py",
     "pydantic>=2",
@@ -118,9 +118,6 @@ packages = [
 ]
 
 [tool.hatch.build.targets.wheel.shared-data]
-
-[tool.hatch.metadata]
-allow-direct-references = true
 
 [tool.pytest.ini_options]
 addopts = [
