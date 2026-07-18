@@ -1,6 +1,6 @@
 """CSP adapter for Discord using chatom backend."""
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 # Re-export from chatom.discord for convenience
 from chatom.discord import (
