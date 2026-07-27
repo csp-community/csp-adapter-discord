@@ -3,8 +3,6 @@
 This module provides a CSP adapter for Discord that wraps the chatom DiscordBackend.
 """
 
-from typing import Optional, Set
-
 import csp
 from chatom.csp import BackendAdapter
 from chatom.discord import DiscordBackend, DiscordConfig, DiscordMessage, DiscordPresence
@@ -50,7 +48,7 @@ class DiscordAdapter(BackendAdapter):
     # NOTE: Cannot use @csp.graph decorator, https://github.com/Point72/csp/issues/183
     def subscribe(
         self,
-        channels: Optional[Set[str]] = None,
+        channels: set[str] | None = None,
         skip_own: bool = True,
         skip_history: bool = True,
     ) -> ts[[DiscordMessage]]:

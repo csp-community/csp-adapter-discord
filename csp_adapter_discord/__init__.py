@@ -30,30 +30,24 @@ from .adapter import DiscordAdapter, DiscordAdapterManager
 from .adapter_config import DiscordAdapterConfig
 
 __all__ = (
-    # Adapter
-    "DiscordAdapter",
-    "DiscordAdapterManager",  # Legacy alias
-    # Backend and config (from chatom)
-    "DiscordBackend",
-    "DiscordConfig",
-    # Models (from chatom)
-    "DiscordMessage",
-    "DiscordMessageType",
-    "DiscordMessageFlags",
-    "DiscordUser",
-    "DiscordChannel",
-    "DiscordChannelType",
-    "DiscordPresence",
     "DiscordActivity",
     "DiscordActivityType",
-    # Utilities (from chatom)
-    "mention_user",
+    "DiscordAdapter",
+    "DiscordAdapterConfig",  # Legacy
+    "DiscordAdapterManager",  # Legacy alias
+    "DiscordBackend",
+    "DiscordChannel",
+    "DiscordChannelType",
+    "DiscordConfig",
+    "DiscordMessage",
+    "DiscordMessageFlags",
+    "DiscordMessageType",
+    "DiscordPresence",
+    "DiscordUser",
+    "MockDiscordBackend",
     "mention_channel",
-    "mention_role",
     "mention_everyone",
     "mention_here",
-    # Testing
-    "MockDiscordBackend",
-    # Legacy
-    "DiscordAdapterConfig",
+    "mention_role",
+    "mention_user",
 )
