@@ -6,7 +6,6 @@ maps to chatom's DiscordConfig fields as closely as possible.
 """
 
 from pathlib import Path
-from typing import List, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -24,7 +23,7 @@ class DiscordAdapterConfig(BaseModel):
     """
 
     token: str = Field(description="The token for the Discord bot")
-    intents: Optional[List[str]] = Field(
+    intents: list[str] | None = Field(
         default=None,
         description="The intents for the Discord bot (e.g., ['guilds', 'guild_messages'])",
     )

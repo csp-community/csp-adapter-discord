@@ -19,8 +19,7 @@ import asyncio
 import os
 import sys
 import traceback
-from datetime import datetime, timedelta
-from typing import List, Optional
+from datetime import UTC, datetime, timedelta
 
 import csp
 from chatom.base import Message, PresenceStatus
@@ -40,7 +39,7 @@ from csp import ts
 from csp_adapter_discord import DiscordAdapter
 
 
-def get_env(name: str, required: bool = True) -> Optional[str]:
+def get_env(name: str, required: bool = True) -> str | None:
     """Get environment variable with validation."""
     value = os.environ.get(name)
     if required and not value:
@@ -63,15 +62,15 @@ class TestState:
     """Container for test state."""
 
     def __init__(self):
-        self.results: List[tuple] = []
-        self.config: Optional[DiscordConfig] = None
-        self.channel_id: Optional[str] = None
-        self.user_id: Optional[str] = None
+        self.results: list[tuple] = []
+        self.config: DiscordConfig | None = None
+        self.channel_id: str | None = None
+        self.user_id: str | None = None
         self.user = None  # Store the user object for mentions
-        self.bot_user_id: Optional[str] = None
-        self.bot_display_name: Optional[str] = None
-        self.guild_id: Optional[str] = None
-        self.received_message: Optional[Message] = None
+        self.bot_user_id: str | None = None
+        self.bot_display_name: str | None = None
+        self.guild_id: str | None = None
+        self.received_message: Message | None = None
         self.waiting_for_inbound: bool = False
         self.test_complete: bool = False
 
@@ -107,7 +106,7 @@ USER_NAME = get_env("DISCORD_TEST_USER_NAME")
 GUILD_NAME = get_env("DISCORD_GUILD_NAME")
 
 
-async def resolve_guild(backend: DiscordBackend, guild_name: str) -> Optional[str]:
+async def resolve_guild(backend: DiscordBackend, guild_name: str) -> str | None:
     """Look up the guild by name to get the guild ID.
 
     Uses the backend's public API for organization lookup.
@@ -128,12 +127,12 @@ async def resolve_guild(backend: DiscordBackend, guild_name: str) -> Optional[st
 
         return None
 
-    except Exception:
+    except Exception:  # noqa: BLE001 - report any integration failure and continue
         traceback.print_exc()
         return None
 
 
-async def lookup_user_by_name(backend: DiscordBackend, name: str, guild_id: str, channel_id: str) -> Optional[str]:
+async def lookup_user_by_name(backend: DiscordBackend, name: str, guild_id: str, channel_id: str) -> str | None:
     """Look up a user ID by name or display name.
 
     Follows the same pattern as discord_e2e.py - tries multiple methods.
@@ -161,12 +160,12 @@ async def lookup_user_by_name(backend: DiscordBackend, name: str, guild_id: str,
                             author_handle = author.handle.lower() if author.handle else ""
                             if author_name == search_name or author_handle == search_name:
                                 return author.id
-            except Exception as msg_err:
+            except Exception as msg_err:  # noqa: BLE001 - fallback must not abort remaining tests
                 print(f"  Could not search message history: {msg_err}")
 
         return None
 
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - report any integration failure and continue
         error_msg = str(e)
         if "members" in error_msg.lower() or "intents" in error_msg.lower():
             print("  Note: User lookup requires Server Members Intent (privileged intent)")
@@ -210,7 +209,7 @@ async def setup_and_run_pre_csp_tests():
         else:
             STATE.log(f"Channel '#{CHANNEL_NAME}' not found", success=False)
             return False
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - report any integration failure and continue
         STATE.log(f"Channel lookup failed: {e}", success=False)
         traceback.print_exc()
         return False
@@ -224,7 +223,7 @@ async def setup_and_run_pre_csp_tests():
             STATE.user = await backend.fetch_user(user_id)
             STATE.log(f"Found user '@{USER_NAME}'")
             print(f"  User ID: {STATE.user_id}")
-        except Exception:
+        except Exception:  # noqa: BLE001 - user details are optional for later tests
             STATE.log(f"Found user ID '{user_id}' but couldn't fetch details")
     else:
         print(f"  ⚠️  User '{USER_NAME}' not found. Some tests may be skipped.")
@@ -251,7 +250,7 @@ async def setup_and_run_pre_csp_tests():
                 print(f"  User ID: {user.id}")
                 print(f"  Name: {user.name}")
                 print(f"  Handle: {user.handle}")
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - report any integration failure and continue
             STATE.log(f"Fetch user failed: {e}", success=False)
     else:
         print("  Skipping (no user ID)")
@@ -265,20 +264,20 @@ async def setup_and_run_pre_csp_tests():
             print(f"  Channel ID: {channel.id}")
             print(f"  Name: {channel.name}")
             print(f"  Topic: {getattr(channel, 'topic', 'N/A')}")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - report any integration failure and continue
         STATE.log(f"Fetch channel failed: {e}", success=False)
 
     # Test: Send Plain Message
     STATE.section("Test: Send Plain Message (async)")
     try:
-        timestamp = datetime.now().strftime("%H:%M:%S")
+        timestamp = datetime.now(UTC).astimezone().strftime("%H:%M:%S")
         msg = FormattedMessage().add_text(f"🧪 [CSP E2E] Plain message sent at {timestamp}")
         content = msg.render(Format.DISCORD_MARKDOWN)
         result = await backend.send_message(STATE.channel_id, content)
         STATE.log(f"Sent plain message at {timestamp}")
         if result:
             print(f"  Message ID: {result.id}")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - report any integration failure and continue
         STATE.log(f"Send message failed: {e}", success=False)
 
     # Test: Send Formatted Message
@@ -298,7 +297,7 @@ async def setup_and_run_pre_csp_tests():
         content = msg.render(Format.DISCORD_MARKDOWN)
         await backend.send_message(STATE.channel_id, content)
         STATE.log("Sent formatted message with bold, italic, code")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - report any integration failure and continue
         STATE.log(f"Send formatted message failed: {e}", success=False)
 
     # Test: Mentions
@@ -318,7 +317,7 @@ async def setup_and_run_pre_csp_tests():
         )
         await backend.send_message(STATE.channel_id, msg.render(Format.DISCORD_MARKDOWN))
         STATE.log("Sent message with mentions")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - report any integration failure and continue
         STATE.log(f"Mentions test failed: {e}", success=False)
 
     # Test: Reactions
@@ -338,7 +337,7 @@ async def setup_and_run_pre_csp_tests():
             await asyncio.sleep(1)
             await backend.remove_reaction(message_id, "👎", channel=STATE.channel_id)
             STATE.log("Removed 👎 reaction")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - report any integration failure and continue
         STATE.log(f"Reactions test failed: {e}", success=False)
 
     # Test: Rich Content Table
@@ -359,7 +358,7 @@ async def setup_and_run_pre_csp_tests():
         msg.content.append(table)
         await backend.send_message(STATE.channel_id, msg.render(Format.DISCORD_MARKDOWN))
         STATE.log("Sent rich content with table")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - report any integration failure and continue
         STATE.log(f"Rich content test failed: {e}", success=False)
 
     # Test: Fetch Message History
@@ -370,7 +369,7 @@ async def setup_and_run_pre_csp_tests():
         for m in history[:3]:
             preview = (m.content or "")[:40].replace("\n", " ")
             print(f"  - {preview}...")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - report any integration failure and continue
         STATE.log(f"Fetch message history failed: {e}", success=False)
 
     # Test: Presence
@@ -389,7 +388,7 @@ async def setup_and_run_pre_csp_tests():
             status_text="Ready!",
         )
         STATE.log("Reset bot presence to online")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - report any integration failure and continue
         STATE.log(f"Presence test failed: {e}", success=False)
 
     # Test: Create DM
@@ -405,8 +404,8 @@ async def setup_and_run_pre_csp_tests():
                     test_user_id = author_id
                     print(f"  Found user ID from message history: {test_user_id}")
                     break
-        except Exception:
-            pass
+        except Exception as e:  # noqa: BLE001 - DM coverage is optional
+            print(f"  Could not find DM user from message history: {e}")
 
     if test_user_id:
         try:
@@ -419,7 +418,7 @@ async def setup_and_run_pre_csp_tests():
                 STATE.log("Sent message to DM")
             else:
                 STATE.log("Failed to create DM", success=False)
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - report any integration failure and continue
             STATE.log(f"DM test failed: {e}", success=False)
     else:
         print("  Skipping DM test - no user ID available")
@@ -455,7 +454,7 @@ def discord_csp_e2e_graph():
             if step == 0:
                 # Send plain message
                 STATE.section("Test: Send Plain Message (via CSP)")
-                timestamp = datetime.now().strftime("%H:%M:%S")
+                timestamp = datetime.now(UTC).astimezone().strftime("%H:%M:%S")
                 msg = FormattedMessage().add_text(f"🧪 [CSP E2E] Plain message at {timestamp}")
                 STATE.log(f"Sending plain message at {timestamp}")
                 csp.schedule_alarm(a_step, timedelta(seconds=1), 1)
@@ -748,7 +747,7 @@ async def main_async():
         )
     except KeyboardInterrupt:
         print("\n\nInterrupted by user")
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - report graph failure before printing summary
         print(f"\n\nCSP graph error: {e}")
 
     return STATE.print_summary()

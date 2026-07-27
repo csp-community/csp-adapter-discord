@@ -2,7 +2,7 @@
 
 import asyncio
 import tempfile
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock, patch
 
 import csp
@@ -470,11 +470,13 @@ class TestDiscordAdapter:
             adapter = DiscordAdapter(config=config)
             mock_presence = MagicMock()
             # _extract_presence_status is a csp.node; we mock it
-            with patch.object(adapter, "_extract_presence_status", return_value="status_ts") as mock_extract:
-                with patch.object(type(adapter).__bases__[0], "publish_presence") as mock_pub_pres:
-                    adapter.publish_presence(mock_presence, timeout=10.0)
-                    mock_extract.assert_called_once_with(mock_presence)
-                    mock_pub_pres.assert_called_once_with(presence="status_ts", timeout=10.0)
+            with (
+                patch.object(adapter, "_extract_presence_status", return_value="status_ts") as mock_extract,
+                patch.object(type(adapter).__bases__[0], "publish_presence") as mock_pub_pres,
+            ):
+                adapter.publish_presence(mock_presence, timeout=10.0)
+                mock_extract.assert_called_once_with(mock_presence)
+                mock_pub_pres.assert_called_once_with(presence="status_ts", timeout=10.0)
 
     def test_extract_presence_status_with_enum(self):
         """_extract_presence_status extracts status.value from DiscordPresence."""
@@ -488,7 +490,7 @@ class TestDiscordAdapter:
             result = adapter._extract_presence_status(presence)
             csp.output(result=result)
 
-        out = csp.run(g, starttime=datetime.now(), endtime=timedelta(seconds=1))
+        out = csp.run(g, starttime=datetime.now(UTC), endtime=timedelta(seconds=1))
         assert len(out["result"]) == 1
         assert out["result"][0][1] == "online"
 
@@ -504,7 +506,7 @@ class TestDiscordAdapter:
             result = adapter._extract_presence_status(presence)
             csp.output(result=result)
 
-        out = csp.run(g, starttime=datetime.now(), endtime=timedelta(seconds=1))
+        out = csp.run(g, starttime=datetime.now(UTC), endtime=timedelta(seconds=1))
         assert len(out["result"]) == 1
         assert out["result"][0][1] == "idle"
 
@@ -519,5 +521,5 @@ class TestDiscordAdapter:
             result = adapter._extract_presence_status(presence)
             csp.output(result=result)
 
-        out = csp.run(g, starttime=datetime.now(), endtime=timedelta(seconds=1))
+        out = csp.run(g, starttime=datetime.now(UTC), endtime=timedelta(seconds=1))
         assert out["result"][0][1] == "dnd"
