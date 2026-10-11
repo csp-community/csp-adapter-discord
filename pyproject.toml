@@ -87,13 +87,9 @@ replace = 'version = "{new_version}"'
 [tool.coverage.run]
 branch = true
 omit = [
-<<<<<<< before updating
-    "csp_adapter_discord/tests/integration/",
-    "csp_adapter_discord/tests/discord_csp_e2e.py",
     "csp_adapter_discord/examples/*",
-=======
+    "csp_adapter_discord/tests/discord_csp_e2e.py",
     "csp_adapter_discord/tests/integration/*",
->>>>>>> after updating
 ]
 
 [tool.coverage.report]
