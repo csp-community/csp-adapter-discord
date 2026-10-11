@@ -20,6 +20,7 @@ import os
 import sys
 import traceback
 from datetime import UTC, datetime, timedelta
+from typing import cast
 
 import csp
 from chatom.base import Message, PresenceStatus
@@ -112,8 +113,8 @@ async def resolve_guild(backend: DiscordBackend, guild_name: str) -> str | None:
     Uses the backend's public API for organization lookup.
     """
     try:
-        # Use the backend's fetch_organization_by_name method
-        guild = await backend.fetch_organization_by_name(guild_name)
+        # Use the backend's public guild lookup
+        guild = await backend.fetch_guild(name=guild_name)
 
         if guild:
             backend.config.guild_id = guild.id
@@ -189,6 +190,7 @@ async def setup_and_run_pre_csp_tests():
 
     # Resolve guild
     STATE.section("Resolving Guild")
+    assert GUILD_NAME is not None
     guild_id = await resolve_guild(backend, GUILD_NAME)
     if guild_id:
         STATE.guild_id = guild_id
@@ -201,6 +203,7 @@ async def setup_and_run_pre_csp_tests():
     # Resolve channel
     STATE.section("Resolving Channel")
     try:
+        assert CHANNEL_NAME is not None
         channel = await backend.fetch_channel_by_name(CHANNEL_NAME, STATE.guild_id)
         if channel:
             STATE.channel_id = channel.id
@@ -216,6 +219,9 @@ async def setup_and_run_pre_csp_tests():
 
     # Resolve user
     STATE.section("Resolving User")
+    assert USER_NAME is not None
+    assert STATE.guild_id is not None
+    assert STATE.channel_id is not None
     user_id = await lookup_user_by_name(backend, USER_NAME, STATE.guild_id, STATE.channel_id)
     if user_id:
         STATE.user_id = user_id
@@ -409,10 +415,10 @@ async def setup_and_run_pre_csp_tests():
 
     if test_user_id:
         try:
-            dm_channel = await backend.create_dm(test_user_id)
+            dm_channel = await backend.create_dm([test_user_id])
             if dm_channel:
-                STATE.log(f"Created DM: {dm_channel.id[:20] if hasattr(dm_channel, 'id') else str(dm_channel)[:20]}...")
-                dm_id = dm_channel.id if hasattr(dm_channel, "id") else dm_channel
+                STATE.log(f"Created DM: {dm_channel[:20]}...")
+                dm_id = dm_channel
                 msg = FormattedMessage().add_text("🧪 [CSP E2E] DM test message (async)")
                 await backend.send_message(dm_id, msg.render(Format.DISCORD_MARKDOWN))
                 STATE.log("Sent message to DM")
@@ -433,7 +439,11 @@ async def setup_and_run_pre_csp_tests():
 @csp.graph
 def discord_csp_e2e_graph():
     """CSP graph for message streaming tests."""
-    adapter = DiscordAdapter(STATE.config)
+    config = STATE.config
+    assert config is not None
+    channel_id = STATE.channel_id
+    assert channel_id is not None
+    adapter = DiscordAdapter(config)
 
     # Subscribe to all messages
     messages = adapter.subscribe()
@@ -458,7 +468,7 @@ def discord_csp_e2e_graph():
                 msg = FormattedMessage().add_text(f"🧪 [CSP E2E] Plain message at {timestamp}")
                 STATE.log(f"Sending plain message at {timestamp}")
                 csp.schedule_alarm(a_step, timedelta(seconds=1), 1)
-                return DiscordMessage(channel=DiscordChannel(id=STATE.channel_id), content=msg.render(Format.DISCORD_MARKDOWN))
+                return DiscordMessage(channel=DiscordChannel(id=channel_id), content=msg.render(Format.DISCORD_MARKDOWN))
 
             elif step == 1:
                 # Send Discord markdown
@@ -474,7 +484,7 @@ def discord_csp_e2e_graph():
                 )
                 STATE.log("Sending markdown message")
                 csp.schedule_alarm(a_step, timedelta(seconds=1), 2)
-                return DiscordMessage(channel=DiscordChannel(id=STATE.channel_id), content=msg.render(Format.DISCORD_MARKDOWN))
+                return DiscordMessage(channel=DiscordChannel(id=channel_id), content=msg.render(Format.DISCORD_MARKDOWN))
 
             elif step == 2:
                 # Mentions
@@ -484,7 +494,7 @@ def discord_csp_e2e_graph():
                 msg = FormattedMessage().add_text("🧪 [CSP E2E] Mention: ").add_raw(user_mention)
                 STATE.log("Sending mention message")
                 csp.schedule_alarm(a_step, timedelta(seconds=1), 3)
-                return DiscordMessage(channel=DiscordChannel(id=STATE.channel_id), content=msg.render(Format.DISCORD_MARKDOWN))
+                return DiscordMessage(channel=DiscordChannel(id=channel_id), content=msg.render(Format.DISCORD_MARKDOWN))
 
             elif step == 3:
                 # Table
@@ -497,7 +507,7 @@ def discord_csp_e2e_graph():
                 msg.content.append(table)
                 STATE.log("Sending table message")
                 csp.schedule_alarm(a_step, timedelta(seconds=1), 4)
-                return DiscordMessage(channel=DiscordChannel(id=STATE.channel_id), content=msg.render(Format.DISCORD_MARKDOWN))
+                return DiscordMessage(channel=DiscordChannel(id=channel_id), content=msg.render(Format.DISCORD_MARKDOWN))
 
             elif step == 4:
                 # Inbound message prompt
@@ -516,7 +526,7 @@ def discord_csp_e2e_graph():
                 print(f"\n  ⏳ Mention the bot: @{STATE.bot_display_name} hello")
                 # Don't schedule next - wait for inbound
 
-                return DiscordMessage(channel=DiscordChannel(id=STATE.channel_id), content=msg.render(Format.DISCORD_MARKDOWN))
+                return DiscordMessage(channel=DiscordChannel(id=channel_id), content=msg.render(Format.DISCORD_MARKDOWN))
 
             elif step == 5:
                 # Confirmation after inbound received
@@ -536,7 +546,7 @@ def discord_csp_e2e_graph():
                         .add_text("\n\nYour message was received through adapter.subscribe()")
                     )
                     csp.schedule_alarm(a_step, timedelta(seconds=1), 6)
-                    return DiscordMessage(channel=DiscordChannel(id=STATE.channel_id), content=confirm.render(Format.DISCORD_MARKDOWN))
+                    return DiscordMessage(channel=DiscordChannel(id=channel_id), content=confirm.render(Format.DISCORD_MARKDOWN))
                 else:
                     STATE.log("No message received", success=False)
                     csp.schedule_alarm(a_step, timedelta(seconds=1), 6)
@@ -582,11 +592,11 @@ def discord_csp_e2e_graph():
                 .add_bold("[CSP E2E] Inbound test skipped (timeout)")
                 .add_text("\n\nNo user message received within timeout period.")
             )
-            return DiscordMessage(channel=DiscordChannel(id=STATE.channel_id), content=skip_msg.render(Format.DISCORD_MARKDOWN))
+            return DiscordMessage(channel=DiscordChannel(id=channel_id), content=skip_msg.render(Format.DISCORD_MARKDOWN))
 
         if csp.ticked(msgs) and STATE.waiting_for_inbound and not s_found:
             result = None
-            for msg in msgs:
+            for msg in cast(list[Message], msgs):
                 # Skip bot's own messages
                 if hasattr(msg, "author_id") and msg.author_id == STATE.bot_user_id:
                     continue
@@ -610,7 +620,7 @@ def discord_csp_e2e_graph():
                     .add_bold("[CSP E2E] Message received via CSP!")
                     .add_text("\n\nYour message was received through adapter.subscribe()")
                 )
-                result = DiscordMessage(channel=DiscordChannel(id=STATE.channel_id), content=confirm.render(Format.DISCORD_MARKDOWN))
+                result = DiscordMessage(channel=DiscordChannel(id=channel_id), content=confirm.render(Format.DISCORD_MARKDOWN))
 
                 # Mark complete
                 STATE.section("CSP Tests Complete")
@@ -679,7 +689,7 @@ def discord_csp_e2e_graph():
                 .add_bold("[CSP E2E] Inbound test skipped (timeout)")
                 .add_text("\n\nNo user message received within timeout period.")
             )
-            return DiscordMessage(channel=DiscordChannel(id=STATE.channel_id), content=skip_msg.render(Format.DISCORD_MARKDOWN))
+            return DiscordMessage(channel=DiscordChannel(id=channel_id), content=skip_msg.render(Format.DISCORD_MARKDOWN))
 
     timeout_msgs = inbound_timeout()
 

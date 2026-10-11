@@ -3,8 +3,10 @@
 This module provides a CSP adapter for Discord that wraps the chatom DiscordBackend.
 """
 
+from typing import cast
+
 import csp
-from chatom.csp import BackendAdapter
+from chatom.csp.adapter import BackendAdapter
 from chatom.discord import DiscordBackend, DiscordConfig, DiscordMessage, DiscordPresence
 from csp import ts
 
@@ -100,7 +102,8 @@ class DiscordAdapter(BackendAdapter):
     def _extract_presence_status(self, p: ts[DiscordPresence]) -> ts[str]:
         """Extract status string from DiscordPresence."""
         if csp.ticked(p):
-            return p.status.value if hasattr(p.status, "value") else str(p.status)
+            presence = cast(DiscordPresence, p)
+            return presence.status.value if hasattr(presence.status, "value") else str(presence.status)
 
     # NOTE: Cannot use @csp.graph decorator, https://github.com/Point72/csp/issues/183
     def publish_presence(self, presence: ts[DiscordPresence], timeout: float = 5.0):

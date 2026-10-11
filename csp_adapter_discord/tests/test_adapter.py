@@ -115,12 +115,9 @@ class TestDiscordAdapterConfig:
         assert chatom_config.intents == ["guilds", "guild_messages"]
 
     def test_to_discord_config_no_intents(self):
-        """When intents is None, to_discord_config passes None which DiscordConfig rejects."""
-        token = "x" * 72
+        token = "a" * 72
         legacy = DiscordAdapterConfig(token=token)
-        # DiscordConfig requires intents to be a list, so None raises
-        with pytest.raises(ValidationError):
-            legacy.to_discord_config()
+        assert legacy.to_discord_config().intents == DiscordConfig(bot_token=token).intents
 
 
 # ---------------------------------------------------------------------------
@@ -141,6 +138,7 @@ class TestDiscordMessage:
             content="Hello!",
             author=DiscordUser(id="123", name="TestUser"),
         )
+        assert msg.author is not None
         assert msg.author.id == "123"
         assert msg.author.name == "TestUser"
 
