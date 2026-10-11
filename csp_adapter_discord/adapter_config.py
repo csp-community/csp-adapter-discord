@@ -44,7 +44,6 @@ class DiscordAdapterConfig(BaseModel):
         """
         from chatom.discord import DiscordConfig
 
-        return DiscordConfig(
-            bot_token=self.token,
-            intents=self.intents,
-        )
+        if self.intents is None:
+            return DiscordConfig(bot_token=self.token)
+        return DiscordConfig(bot_token=self.token, intents=self.intents)

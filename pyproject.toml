@@ -50,6 +50,7 @@ develop = [
     "codespell",
     "hatchling",
     "mdformat",
+    "mdformat-frontmatter",
     "mdformat-tables>=1",
     "pytest",
     "pytest-asyncio",
@@ -86,9 +87,9 @@ replace = 'version = "{new_version}"'
 [tool.coverage.run]
 branch = true
 omit = [
-    "csp_adapter_discord/tests/integration/",
-    "csp_adapter_discord/tests/discord_csp_e2e.py",
     "csp_adapter_discord/examples/*",
+    "csp_adapter_discord/tests/discord_csp_e2e.py",
+    "csp_adapter_discord/tests/integration/*",
 ]
 
 [tool.coverage.report]
@@ -152,3 +153,15 @@ section-order = [
     "F401",
     "F403",
 ]
+
+# CSP compiles stream and named-output annotations and allows nodes not to emit a value.
+[[tool.ty.overrides]]
+include = [
+    "csp_adapter_discord/adapter.py",
+    "csp_adapter_discord/examples/*.py",
+    "csp_adapter_discord/tests/discord_csp_e2e.py",
+    "csp_adapter_discord/tests/test_adapter.py",
+]
+[tool.ty.overrides.rules]
+invalid-return-type = "ignore"
+invalid-type-form = "ignore"
